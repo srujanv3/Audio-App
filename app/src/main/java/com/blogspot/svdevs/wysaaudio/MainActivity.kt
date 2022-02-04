@@ -1,16 +1,16 @@
 package com.blogspot.svdevs.wysaaudio
 
 import android.content.Intent
-import android.media.MediaPlayer
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
-import com.blogspot.svdevs.wysaaudio.Constants.ACTION_PAUSE
-import com.blogspot.svdevs.wysaaudio.Constants.ACTION_START
-import com.blogspot.svdevs.wysaaudio.Constants.ACTION_STOP
+import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_PAUSE
+import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_START
+import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_STOP
+import com.blogspot.svdevs.wysaaudio.service.MusicService.Companion.mediaPlayer
 import com.blogspot.svdevs.wysaaudio.databinding.ActivityMainBinding
+import com.blogspot.svdevs.wysaaudio.service.MusicService
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         var isPlayingMain = false
 //        var mediaPlayer: MediaPlayer? = null
-        var mediaPlayer: MediaPlayer? = MusicService.mediaPlayer
+        //var mediaPlayer: MediaPlayer? = MusicService.mediaPlayer
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendCommandToService(action:String){
-        Intent(this,MusicService::class.java).also {
+        Intent(this, MusicService::class.java).also {
             it.action = action
             this.startService(it)
         }

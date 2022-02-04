@@ -26,8 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".MusicService"/>
-        <receiver android:name=".NotificationReceiver"
+        <service android:name=".service.MusicService"/>
+        <receiver android:name=".service.NotificationReceiver"
             android:enabled="true"/>
     </application>
 

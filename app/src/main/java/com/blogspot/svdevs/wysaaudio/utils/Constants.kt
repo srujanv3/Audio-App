@@ -1,4 +1,4 @@
-package com.blogspot.svdevs.wysaaudio
+package com.blogspot.svdevs.wysaaudio.utils
 
 object Constants {
 
