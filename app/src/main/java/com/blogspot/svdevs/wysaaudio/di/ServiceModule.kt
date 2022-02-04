@@ -23,38 +23,32 @@ object ServiceModule {
 
     @Provides
     @ServiceScoped
-    fun provideMainActivityPendingIntent(@ApplicationContext app: Context) = PendingIntent.getActivity(
-    app,
-    0,
-    Intent(app, MainActivity::class.java).also {
-        it.action = Constants.ACTION_SHOW_MUSIC_ACTIVITY
-    },
-    PendingIntent.FLAG_UPDATE_CURRENT
-    )
+    fun provideMainActivityPendingIntent(@ApplicationContext app: Context) =
+        PendingIntent.getActivity(
+            app,
+            0,
+            Intent(app, MainActivity::class.java).also {
+                it.action = Constants.ACTION_SHOW_MUSIC_ACTIVITY
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
 
     @ServiceScoped
     @Provides
-    fun provideBaseNotificationBuilder(@ApplicationContext app: Context, pendingIntent: PendingIntent) =
-     NotificationCompat.Builder(app,
-        Constants.NOTIFICATION_CHANNEL_ID
-    )
-        .setAutoCancel(false)
-        .setOngoing(true)
-        .setSmallIcon(R.drawable.play)
-//    .setLargeIcon(
-//        BitmapFactory.decodeResource(resources,
-//    R.drawable.music
-//    ))
-    .setContentTitle("Wysa Audio")
-//    .setStyle(
-//    androidx.media.app.NotificationCompat.MediaStyle()
-//    .setMediaSession(mediaSession.sessionToken)
-//    )
-    .setVisibility(VISIBILITY_PUBLIC)
-    .setContentIntent(pendingIntent) // nav to app on notification click
-//    .addAction(R.drawable.stop, "Stop", stopPendingIntent)
-//    .addAction(R.drawable.play, "Play", null)
-//    .addAction(R.drawable.pause, "Pause", null)
+    fun provideBaseNotificationBuilder(
+        @ApplicationContext app: Context,
+        pendingIntent: PendingIntent
+    ) =
+        NotificationCompat.Builder(
+            app,
+            Constants.NOTIFICATION_CHANNEL_ID
+        )
+            .setAutoCancel(false)
+            .setOngoing(true)
+            .setSmallIcon(R.drawable.play)
+            .setContentTitle("Wysa Audio")
+            .setVisibility(VISIBILITY_PUBLIC)
+            .setContentIntent(pendingIntent) // nav to app on notification click
 
 }
