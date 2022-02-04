@@ -30,14 +30,6 @@ class MainActivity : AppCompatActivity() {
         // Observing live data
         subscribeToObserver()
 
-//        if(mediaPlayer==null) {
-//           mediaPlayer =  MediaPlayer.create(this, Uri.parse(Constants.AUDIO_SOURCE))
-//        }
-//        mediaPlayer!!.reset()
-//        mediaPlayer!!.setDataSource(this, Uri.parse(Constants.AUDIO_SOURCE))
-//        mediaPlayer!!.prepare()
-//        mediaPlayer!!.start()
-
         binding.apply {
             play.setOnClickListener {
                 sendCommandToService(ACTION_START)
