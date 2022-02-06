@@ -3,10 +3,9 @@ package com.blogspot.svdevs.wysaaudio.di
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
-import com.blogspot.svdevs.wysaaudio.MainActivity
+import com.blogspot.svdevs.wysaaudio.ui.MainActivity
 import com.blogspot.svdevs.wysaaudio.R
 import com.blogspot.svdevs.wysaaudio.utils.Constants
 import dagger.Module

@@ -9,18 +9,17 @@ import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import com.blogspot.svdevs.wysaaudio.MainActivity
+import com.blogspot.svdevs.wysaaudio.ui.MainActivity.Companion.binding
 import com.blogspot.svdevs.wysaaudio.R
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_PAUSE
-import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_SHOW_MUSIC_ACTIVITY
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_START
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_STOP
 import com.blogspot.svdevs.wysaaudio.utils.Constants.AUDIO_SOURCE
@@ -34,6 +33,7 @@ import javax.inject.Inject
 class MusicService: LifecycleService() {
 
     var isServiceDestroyed = false // check is service is not destroyed for play pause feature
+    private lateinit var runnable: Runnable
 
     companion object {
         val isPlaying = MutableLiveData<Boolean>()
@@ -57,7 +57,7 @@ class MusicService: LifecycleService() {
         isPlaying.postValue(false)
 
         //init notification builder
-       currentNotificationBuilder = baseNotificationBuilder
+        currentNotificationBuilder = baseNotificationBuilder
 
         // media session
         mediaSession = MediaSessionCompat(this, "MY MUSIC")
@@ -91,7 +91,8 @@ class MusicService: LifecycleService() {
     private fun startService() {
         isPlaying.postValue(true)
         mediaPlayer?.start()
-        //showNotification()
+
+//        seekbarSetup()
 
     }
 
@@ -112,6 +113,10 @@ class MusicService: LifecycleService() {
         mediaPlayer?.release()
         stopForeground(true)
         stopSelf()
+
+//        // reset seekbar when new audio start playing
+//        binding.seekBar.progress = 0
+//        binding.seekBar.max = mediaPlayer!!.duration
     }
 
     // Display notification
@@ -132,10 +137,11 @@ class MusicService: LifecycleService() {
 
         currentNotificationBuilder = baseNotificationBuilder
             .addAction(R.drawable.stop, "Stop", stopPendingIntent)
-            .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
-                .setMediaSession(mediaSession.sessionToken)
+            .setStyle(
+                androidx.media.app.NotificationCompat.MediaStyle()
+                    .setMediaSession(mediaSession.sessionToken)
             )
-            .setLargeIcon(BitmapFactory.decodeResource(resources,R.drawable.music))
+            .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.music))
 
         notificationManager.notify(SERVICE_ID, currentNotificationBuilder.build())
 
@@ -154,6 +160,19 @@ class MusicService: LifecycleService() {
         startForeground(SERVICE_ID, baseNotificationBuilder.build())
 
     }
+
+    private fun seekbarSetup() {
+        // reset seekbar when new audio start playing
+        binding.seekBar.progress = 0
+        binding.seekBar.max = mediaPlayer!!.duration
+
+        runnable = Runnable {
+            binding.seekBar.progress = mediaPlayer!!.currentPosition
+            Handler(Looper.getMainLooper()).postDelayed(runnable, 200)
+        }
+        Handler(Looper.getMainLooper()).postDelayed(runnable, 0)
+    }
+}
 
 //        val pauseIntent = Intent(this,NotificationReceiver::class.java).setAction(ACTION_PAUSE)
 //        val pausePendingIntent = PendingIntent.getBroadcast(this,0,pauseIntent,PendingIntent.FLAG_UPDATE_CURRENT)
@@ -196,4 +215,3 @@ class MusicService: LifecycleService() {
 //        },
 //        PendingIntent.FLAG_UPDATE_CURRENT
 //    )
-}
