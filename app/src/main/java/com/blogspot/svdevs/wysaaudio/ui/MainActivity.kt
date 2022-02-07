@@ -5,17 +5,20 @@ import android.media.MediaPlayer
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.WindowManager
+import android.widget.SeekBar
 import androidx.lifecycle.Observer
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_PAUSE
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_START
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_STOP
 import com.blogspot.svdevs.wysaaudio.databinding.ActivityMainBinding
 import com.blogspot.svdevs.wysaaudio.service.MusicService
+import com.blogspot.svdevs.wysaaudio.service.MusicService.Companion.mediaPlayer
 
 class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
-
 
     companion object {
         var isPlayingMain = false
@@ -46,26 +49,23 @@ class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
             stop.setOnClickListener {
                 sendCommandToService(ACTION_STOP)
             }
-//                    seekBar.apply {
-//                    progress = 0
-//                    max = mediaPlayer!!.duration
-//                }
 
-//            seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-//                override fun onProgressChanged(
-//                    seekBar: SeekBar?,
-//                    progress: Int,
-//                    fromUser: Boolean
-//                ) {
-//                    if(fromUser) {
-//                        MusicService.mediaPlayer!!.seekTo(progress)
-//                    }
-//                }
-//
-//                override fun onStartTrackingTouch(seekBar: SeekBar?)  = Unit
-//
-//                override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
-//            })
+
+            seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    if(fromUser) {
+                        MusicService.mediaPlayer!!.seekTo(progress)
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?)  = Unit
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+            })
         }
 
     }
@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
         })
     }
 
+    // update play & pause buttons
     private fun updatePlaying(isPlaying: Boolean?) {
 
           isPlayingMain = isPlaying!!
@@ -102,5 +103,8 @@ class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
 
     override fun onCompletion(mp: MediaPlayer?) {
         sendCommandToService(ACTION_STOP)
+        binding.seekBar.apply {
+            progress = 0
+        }
     }
 }

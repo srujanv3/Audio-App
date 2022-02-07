@@ -32,7 +32,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MusicService: LifecycleService() {
 
-    var isServiceDestroyed = false // check is service is not destroyed for play pause feature
+    var isServiceDestroyed = true // check is service is not destroyed for play pause feature
     private lateinit var runnable: Runnable
 
     companion object {
@@ -64,6 +64,10 @@ class MusicService: LifecycleService() {
 
         // show notification when service is created
         showNotification()
+
+        // init seekbar
+        binding.seekBar.progress = 0
+        binding.seekBar.max = mediaPlayer!!.duration
     }
 
 
@@ -91,8 +95,10 @@ class MusicService: LifecycleService() {
     private fun startService() {
         isPlaying.postValue(true)
         mediaPlayer?.start()
+        isServiceDestroyed = false
 
-//        seekbarSetup()
+        // trigger seekbar
+        seekbarSetup()
 
     }
 
@@ -101,6 +107,7 @@ class MusicService: LifecycleService() {
         if (mediaPlayer?.isPlaying == true) {
             isPlaying.postValue(false)
             mediaPlayer?.pause()
+            isServiceDestroyed = false
         }
     }
 
@@ -114,9 +121,9 @@ class MusicService: LifecycleService() {
         stopForeground(true)
         stopSelf()
 
-//        // reset seekbar when new audio start playing
-//        binding.seekBar.progress = 0
-//        binding.seekBar.max = mediaPlayer!!.duration
+        // reset seekbar
+        isServiceDestroyed = true
+        binding.seekBar.progress = 0
     }
 
     // Display notification
@@ -163,12 +170,14 @@ class MusicService: LifecycleService() {
 
     private fun seekbarSetup() {
         // reset seekbar when new audio start playing
-        binding.seekBar.progress = 0
-        binding.seekBar.max = mediaPlayer!!.duration
+//        binding.seekBar.progress = 0
+//        binding.seekBar.max = mediaPlayer!!.duration
 
         runnable = Runnable {
-            binding.seekBar.progress = mediaPlayer!!.currentPosition
-            Handler(Looper.getMainLooper()).postDelayed(runnable, 200)
+            if(!isServiceDestroyed) {
+                binding.seekBar.progress = mediaPlayer!!.currentPosition
+                Handler(Looper.getMainLooper()).postDelayed(runnable, 200)
+            }
         }
         Handler(Looper.getMainLooper()).postDelayed(runnable, 0)
     }
