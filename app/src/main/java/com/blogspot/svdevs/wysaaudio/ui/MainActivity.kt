@@ -2,9 +2,11 @@ package com.blogspot.svdevs.wysaaudio.ui
 
 import android.content.Intent
 import android.media.MediaPlayer
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.lifecycle.Observer
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_PAUSE
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_START
@@ -24,6 +26,12 @@ class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Screen display adjustments
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
 
         // Observing live data
         subscribeToObserver()
