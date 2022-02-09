@@ -3,20 +3,17 @@ package com.blogspot.svdevs.wysaaudio.ui
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.view.WindowManager
 import android.widget.SeekBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import com.blogspot.svdevs.wysaaudio.databinding.ActivityMainBinding
+import com.blogspot.svdevs.wysaaudio.service.MusicService
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_PAUSE
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_START
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_STOP
-import com.blogspot.svdevs.wysaaudio.databinding.ActivityMainBinding
-import com.blogspot.svdevs.wysaaudio.service.MusicService
-import com.blogspot.svdevs.wysaaudio.service.MusicService.Companion.mediaPlayer
 
 class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
 
@@ -107,4 +104,5 @@ class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
             progress = 0
         }
     }
+
 }

@@ -5,6 +5,9 @@
       <map>
         <entry key="..\:/Apps/WysaAudio/app/src/main/res/drawable/btn_bg.xml" value="0.19114583333333332" />
         <entry key="..\:/Apps/WysaAudio/app/src/main/res/drawable/gradient_bg.xml" value="0.3935546875" />
+        <entry key="..\:/Apps/WysaAudio/app/src/main/res/drawable/pause.xml" value="0.19114583333333332" />
+        <entry key="..\:/Apps/WysaAudio/app/src/main/res/drawable/play.xml" value="0.19114583333333332" />
+        <entry key="..\:/Apps/WysaAudio/app/src/main/res/drawable/stop.xml" value="0.19114583333333332" />
         <entry key="..\:/Apps/WysaAudio/app/src/main/res/layout/activity_main.xml" value="0.17083333333333334" />
       </map>
     </option>

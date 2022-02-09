@@ -1,30 +1,24 @@
 package com.blogspot.svdevs.wysaaudio.service
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
-import com.blogspot.svdevs.wysaaudio.ui.MainActivity.Companion.binding
+import androidx.lifecycle.Observer
 import com.blogspot.svdevs.wysaaudio.R
+import com.blogspot.svdevs.wysaaudio.ui.MainActivity.Companion.binding
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_PAUSE
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_START
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_STOP
 import com.blogspot.svdevs.wysaaudio.utils.Constants.AUDIO_SOURCE
-import com.blogspot.svdevs.wysaaudio.utils.Constants.NOTIFICATION_CHANNEL_ID
-import com.blogspot.svdevs.wysaaudio.utils.Constants.NOTIFICATION_CHANNEL_NAME
 import com.blogspot.svdevs.wysaaudio.utils.Constants.SERVICE_ID
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -47,6 +41,7 @@ class MusicService: LifecycleService() {
 
     private lateinit var mediaSession: MediaSessionCompat
 
+
     override fun onCreate() {
         super.onCreate()
 
@@ -60,10 +55,13 @@ class MusicService: LifecycleService() {
         currentNotificationBuilder = baseNotificationBuilder
 
         // media session
-        mediaSession = MediaSessionCompat(this, "MY MUSIC")
+        mediaSession = MediaSessionCompat(baseContext, "MY MUSIC")
 
         // show notification when service is created
-        showNotification()
+        isPlaying.observe(this, Observer {
+            showNotification(it)
+        })
+
 
         // init seekbar
         binding.seekBar.progress = 0
@@ -127,44 +125,58 @@ class MusicService: LifecycleService() {
     }
 
     // Display notification
-    fun showNotification() {
+    fun showNotification(isPlaying:Boolean) {
 
-        // system service used when working with notifications
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(notificationManager)
+
+
+        currentNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
+            isAccessible = true
+            set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
         }
 
-        // action handling part
-        val stopIntent = Intent(this, NotificationReceiver::class.java).setAction(ACTION_STOP)
+
+
+        val pendingIntent = if (isPlaying) {
+
+            val pauseIntent = Intent(this, MusicService::class.java).apply {
+                action = ACTION_PAUSE
+            }
+            PendingIntent.getService(this, 0, pauseIntent, FLAG_UPDATE_CURRENT)
+        } else {
+
+            val resumeIntent = Intent(this, MusicService::class.java).apply {
+                action = ACTION_START
+            }
+            PendingIntent.getService(this, 1, resumeIntent, FLAG_UPDATE_CURRENT)
+        }
+
+
+        val actionIcon = if (isPlaying) {
+            R.drawable.pause
+        }else {
+            R.drawable.play
+        }
+
+
+        val stopIntent = Intent(this, NotificationReceiver::class.java).apply {
+            action = ACTION_STOP
+        }
         val stopPendingIntent =
-            PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getBroadcast(this, 2, stopIntent, FLAG_UPDATE_CURRENT)
+
+
 
         currentNotificationBuilder = baseNotificationBuilder
-            .addAction(R.drawable.stop, "Stop", stopPendingIntent)
             .setStyle(
                 androidx.media.app.NotificationCompat.MediaStyle()
                     .setMediaSession(mediaSession.sessionToken)
             )
-            .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.music))
+            .addAction(actionIcon, "Pause", pendingIntent)
+            .addAction(R.drawable.stop, "Stop", stopPendingIntent)
 
-        notificationManager.notify(SERVICE_ID, currentNotificationBuilder.build())
+        startForeground(SERVICE_ID,currentNotificationBuilder.build())
 
-    }
-
-    // Create notification channel
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(notificationManager: NotificationManager) {
-        val channel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID,
-            NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_LOW
-        )
-        notificationManager.createNotificationChannel(channel)
-
-        startForeground(SERVICE_ID, baseNotificationBuilder.build())
 
     }
 
