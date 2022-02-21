@@ -1,14 +1,15 @@
 package com.blogspot.svdevs.wysaaudio.di
 
-import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
-import com.blogspot.svdevs.wysaaudio.ui.MainActivity
 import com.blogspot.svdevs.wysaaudio.R
+import com.blogspot.svdevs.wysaaudio.ui.MainActivity
 import com.blogspot.svdevs.wysaaudio.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -28,10 +29,8 @@ object ServiceModule {
         PendingIntent.getActivity(
             app,
             0,
-            Intent(app, MainActivity::class.java).also {
-                it.action = Constants.ACTION_SHOW_MUSIC_ACTIVITY
-            },
-            PendingIntent.FLAG_UPDATE_CURRENT
+            Intent(app, MainActivity::class.java),
+           0
         )
 
 
@@ -50,6 +49,7 @@ object ServiceModule {
             .setSmallIcon(R.drawable.music)
             .setContentTitle("Wysa Audio")
             .setContentText("Now playing ...")
+            .setPriority(PRIORITY_HIGH)
             .setLargeIcon(BitmapFactory.decodeResource(app.resources, R.drawable.new_icon))
             .setVisibility(VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent) // nav to app on notification click

@@ -11,11 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.blogspot.svdevs.wysaaudio.databinding.ActivityMainBinding
 import com.blogspot.svdevs.wysaaudio.service.MusicService
+import com.blogspot.svdevs.wysaaudio.service.MusicService.Companion.mediaPlayer
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_PAUSE
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_START
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_STOP
 
-class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
+class MainActivity : AppCompatActivity() {
 
     companion object {
         var isPlayingMain = false
@@ -47,6 +48,13 @@ class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
                 sendCommandToService(ACTION_STOP)
             }
 
+            // init seekbar
+            if(MusicService.mediaPlayer != null){
+                // to handle seekbar when launched on Notification click
+                seekBar.max = mediaPlayer!!.duration
+            }
+
+
 
             seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(
@@ -54,9 +62,12 @@ class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
                     progress: Int,
                     fromUser: Boolean
                 ) {
-                    if(fromUser) {
-                        MusicService.mediaPlayer!!.seekTo(progress)
+                    if(!MusicService.isServiceDestroyed){ // issue fixed !!!
+                        if(MusicService.mediaPlayer != null && fromUser) {
+                            MusicService.mediaPlayer!!.seekTo(progress)
+                        }
                     }
+
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?)  = Unit
@@ -65,6 +76,11 @@ class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
             })
         }
 
+//        mediaPlayer?.setOnCompletionListener {
+//            mediaPlayer!!.release()
+//
+//            updatePlaying(isPlaying = false)
+//        }
     }
 
     private fun subscribeToObserver() {
@@ -97,12 +113,4 @@ class MainActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
             this.startService(it)
         }
     }
-
-    override fun onCompletion(mp: MediaPlayer?) {
-        sendCommandToService(ACTION_STOP)
-        binding.seekBar.apply {
-            progress = 0
-        }
-    }
-
 }
