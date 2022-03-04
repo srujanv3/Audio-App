@@ -29,7 +29,12 @@
         </activity>
         <service android:name=".service.MusicService"/>
         <receiver android:name=".service.NotificationReceiver"
-            android:enabled="true"/>
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

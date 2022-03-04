@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.media.AudioAttributes
+import android.media.AudioManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
@@ -54,4 +56,10 @@ object ServiceModule {
             .setVisibility(VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent) // nav to app on notification click
 
+    @ServiceScoped
+    @Provides
+    fun providePlaybackAttributes() = AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_GAME)
+        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+        .build()
 }

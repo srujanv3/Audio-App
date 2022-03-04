@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.SeekBar
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.blogspot.svdevs.wysaaudio.databinding.ActivityMainBinding
@@ -15,24 +17,43 @@ import com.blogspot.svdevs.wysaaudio.service.MusicService.Companion.mediaPlayer
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_PAUSE
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_START
 import com.blogspot.svdevs.wysaaudio.utils.Constants.ACTION_STOP
+import com.blogspot.svdevs.wysaaudio.utils.NetworkUtil
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
         var isPlayingMain = false
         lateinit var binding: ActivityMainBinding
+        lateinit var musicService: MusicService
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Screen display adjustments
+
+        musicService = MusicService()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
+
+
+        val networkConnection = NetworkUtil(applicationContext)
+        networkConnection.observe(this, Observer { isConnected ->
+
+            if (isConnected) {
+                binding.mainLayout.visibility = View.VISIBLE
+                binding.internetLayout.visibility = View.INVISIBLE
+            }else {
+                binding.mainLayout.visibility = View.INVISIBLE
+                binding.internetLayout.visibility = View.VISIBLE
+            }
+
+        })
 
         // Observing live data
         subscribeToObserver()
